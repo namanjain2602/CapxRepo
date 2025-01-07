@@ -1,6 +1,7 @@
 package com.assignment.stock_portfolio_backend.service;
 
 import com.assignment.stock_portfolio_backend.dto.RecommendedStock;
+import com.assignment.stock_portfolio_backend.dto.StockDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +17,13 @@ public class RecommendationService {
     @Autowired
     private StockPriceService stockPriceService;
 
-    public List<RecommendedStock> getRecommendedStocks() {
-        List<String> popularTickers = Arrays.asList("NVDA", "AMD", "AVGO","META"); // Example
-        List<RecommendedStock> recommendations = new ArrayList<>();
+    public List<StockDetailResponse> getRecommendedStocks() {
+        List<String> popularTickers = Arrays.asList("NVDA", "AMD", "AVGO","META");
+        List<StockDetailResponse> recommendations = new ArrayList<>();
 
         for (String ticker : popularTickers) {
-            BigDecimal currentPrice = stockPriceService.fetchCurrentStockPrice(ticker);
-            recommendations.add(new RecommendedStock(ticker, currentPrice));
+            StockDetailResponse stockDetails = stockPriceService.getStockDetails(ticker);
+            recommendations.add(stockDetails);
         }
         return recommendations;
     }

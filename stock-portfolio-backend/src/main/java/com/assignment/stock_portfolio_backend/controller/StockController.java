@@ -57,7 +57,7 @@ public class StockController {
     }
 
     @GetMapping("/recommendations")
-    public ResponseEntity<List<RecommendedStock>> getRecommendations() {
+    public ResponseEntity<List<StockDetailResponse>> getRecommendations() {
         return ResponseEntity.ok(recommendationService.getRecommendedStocks());
     }
 
