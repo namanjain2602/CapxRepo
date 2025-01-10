@@ -11,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,21 +35,37 @@ public class StockPriceService {
     }
 
     public BigDecimal fetchCurrentStockPrice(String ticker) {
-        String url = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
-                .path("/quote")
-                .queryParam("symbol", ticker)
-                .queryParam("token", apiKey)
-                .toUriString();
-        System.out.println("Printing url "+url);
-        StockPriceResponse response = restTemplate.getForObject(url, StockPriceResponse.class);
-        System.out.println("Printing Stock price Object "+response.toString());
+        try {
+            // URL encoding to handle special characters in ticker symbols
+            String encodedTicker = UriUtils.encode(ticker, StandardCharsets.UTF_8);
 
-        if (response != null) {
-            return response.getCurrentPrice();
+            // Build the URL with the encoded ticker
+            String url = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
+                    .path("/quote")
+                    .queryParam("symbol", encodedTicker)
+                    .queryParam("token", apiKey)
+                    .toUriString();
+
+            System.out.println("Request URL: " + url);
+
+            // Fetching the stock price response
+            StockPriceResponse response = restTemplate.getForObject(url, StockPriceResponse.class);
+
+            System.out.println("Stock Price Response: " + response);
+
+            // Check and return the current price
+            if (response != null && response.getCurrentPrice() != null) {
+                return response.getCurrentPrice();
+            } else {
+                throw new RuntimeException("Stock price not found for ticker: " + ticker);
+            }
+        } catch (Exception e) {
+            // Logging and handling errors
+            System.err.println("Error fetching stock price for ticker: " + ticker + ". Error: " + e.getMessage());
+            throw new RuntimeException("Failed to fetch stock price for ticker: " + ticker, e);
         }
-
-        throw new RuntimeException("Failed to fetch stock price for ticker: " + ticker);
     }
+
     public List<StockSearchResponse> searchStocks(String query) {
         String url = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
                 .path("/search")
@@ -80,12 +98,14 @@ public class StockPriceService {
                 .queryParam("token", apiKey)
                 .toUriString();
 //        ResponseEntity<StockPriceResponse> responseEntity = restTemplate.getForEntity(priceUrl, StockPriceResponse.class);
-
+//        System.out.println(profileUrl);
+//        System.out.println(priceUrl);
         StockPriceResponse priceResponse = restTemplate.getForObject(priceUrl, StockPriceResponse.class);
         if (stockDetails != null && priceResponse != null) {
             stockDetails.setCurrentPrice(priceResponse.getCurrentPrice());
             stockDetails.setPriceChange(priceResponse.getChange());
             stockDetails.setPercentageChange(priceResponse.getPercentageChange());
+            //check(stockDetails);
             return stockDetails;
         } else {
             throw new RuntimeException("Failed to fetch details for ticker: " + ticker);

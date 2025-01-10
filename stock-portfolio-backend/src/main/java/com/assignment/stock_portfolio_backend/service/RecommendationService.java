@@ -18,7 +18,12 @@ public class RecommendationService {
     private StockPriceService stockPriceService;
 
     public List<StockDetailResponse> getRecommendedStocks() {
-        List<String> popularTickers = Arrays.asList("NVDA", "AMD", "AVGO","META");
+        List<String> popularTickers = Arrays.asList(
+                "NVDA", "AMD", "AVGO", "META",
+                "AAPL", "MSFT", "GOOG", "AMZN",
+                "TSLA"
+        );
+
         List<StockDetailResponse> recommendations = new ArrayList<>();
 
         for (String ticker : popularTickers) {

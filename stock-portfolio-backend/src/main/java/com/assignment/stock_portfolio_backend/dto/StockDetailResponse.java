@@ -33,6 +33,20 @@ public class StockDetailResponse {
     private BigDecimal priceChange;
     private BigDecimal percentageChange;
 
+    public StockDetailResponse() {
+        this.ticker = "No Data Found";
+        this.name = "No Data Found";
+        this.exchange = "No Data Found";
+        this.ipoDate = "No Date Found";
+        this.marketCapitalization = 0.0;
+        this.website = "No Data";
+        this.logo = "No Image Found";
+        this.industry = "No Industry Found";
+        this.currentPrice = new BigDecimal(0);
+        this.priceChange = new BigDecimal(0);
+        this.percentageChange = new BigDecimal(0);
+    }
+
     public String getTicker() {
         return ticker;
     }

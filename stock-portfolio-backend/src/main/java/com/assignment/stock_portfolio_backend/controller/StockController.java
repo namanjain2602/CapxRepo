@@ -18,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/stocks")
+@CrossOrigin(origins = "http://localhost:3000")
 public class StockController {
 
     @Autowired
@@ -30,7 +31,7 @@ public class StockController {
     private RecommendationService recommendationService;
 
     @PostMapping
-    public ResponseEntity<Stock> addStock(@RequestBody @Valid Stock stock) {
+    public ResponseEntity<Stock> addStock(@RequestBody  Stock stock) {
         return ResponseEntity.status(201).body(stockService.addStock(stock));
     }
 
@@ -39,9 +40,9 @@ public class StockController {
         return ResponseEntity.ok(stockService.updateStock(id, stock));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStock(@PathVariable Long id) {
-        stockService.deleteStock(id);
+    @DeleteMapping("/{ticker}/{quantity}")
+    public ResponseEntity<Void> deleteStock(@PathVariable String ticker, @PathVariable int quantity) {
+        stockService.deleteStock(ticker,quantity);
         return ResponseEntity.noContent().build();
     }
 
@@ -73,6 +74,18 @@ public class StockController {
         return ResponseEntity.ok(stockDetails);
     }
 
+    @GetMapping("/info")
+    public ResponseEntity<PortfolioDetailResponse> getStockInfo(@RequestParam String ticker) {
+        // Debug log to check the ticker received
+        //System.out.println("Received ticker: " + ticker);
 
+        // Service method to fetch stock info
+        PortfolioDetailResponse stockDetails = stockService.getStockInfo(ticker);
 
+        // Return the response as JSON
+        return ResponseEntity.ok(stockDetails);
+    }
 }
+
+
+

@@ -15,20 +15,20 @@ public class Stock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Stock name cannot be null")
+    //@NotBlank(message = "Stock name cannot be null")
     private String stockName;
 
 
-    @NotBlank(message = "Ticker cannot be blank")
+    //@NotBlank(message = "Ticker cannot be blank")
     @Column(unique = true)
     private String ticker;
 
-    @NotNull(message = "Buy price cannot be null")
+  //  @NotNull(message = "Buy price cannot be null")
     @DecimalMin(value = "0.0", inclusive = true, message = "Buy price must be at least 0.0")
     private BigDecimal buyPrice;
 
-    @NotBlank(message = "Quantity cannot be null")
-    @Min(value = 1, message = "Quantity must be at least 1")
+    //@NotBlank(message = "Quantity cannot be null")
+   // @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity = 1;
 
     public Long getId() {

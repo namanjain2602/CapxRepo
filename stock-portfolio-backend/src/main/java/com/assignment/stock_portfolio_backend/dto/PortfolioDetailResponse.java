@@ -16,8 +16,7 @@ public class PortfolioDetailResponse {
     private BigDecimal priceChangeAmount;
     private BigDecimal priceChangePercentage;
 
-    // Getters and Setters
-
+    // Getters and Setter
     public PortfolioDetailResponse(String stockName, String ticker, BigDecimal purchasePrice, BigDecimal currentPrice,
                                    BigDecimal quantity) {
         this.stockName = stockName;
@@ -33,6 +32,10 @@ public class PortfolioDetailResponse {
         this.priceChangeAmount = currentPrice.subtract(purchasePrice);
         this.priceChangePercentage = purchasePrice.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO :
                 priceChangeAmount.divide(purchasePrice, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
+    }
+
+
+    public PortfolioDetailResponse() {
     }
 
     public String getStockName() {
@@ -121,5 +124,22 @@ public class PortfolioDetailResponse {
 
     public void setPriceChangePercentage(BigDecimal priceChangePercentage) {
         this.priceChangePercentage = priceChangePercentage;
+    }
+
+    @Override
+    public String toString() {
+        return "PortfolioDetailResponse{" +
+                "stockName='" + stockName + '\'' +
+                ", ticker='" + ticker + '\'' +
+                ", purchasePrice=" + purchasePrice +
+                ", currentPrice=" + currentPrice +
+                ", quantity=" + quantity +
+                ", totalPurchasedValue=" + totalPurchasedValue +
+                ", totalCurrentValue=" + totalCurrentValue +
+                ", profitLossAmount=" + profitLossAmount +
+                ", profitLossPercentage=" + profitLossPercentage +
+                ", priceChangeAmount=" + priceChangeAmount +
+                ", priceChangePercentage=" + priceChangePercentage +
+                '}';
     }
 }
