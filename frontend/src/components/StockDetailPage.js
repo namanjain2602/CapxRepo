@@ -5,6 +5,7 @@ import Footer from "../sharedComponents/Footer";
 import { fetchStockDetails, buyStock } from "../services/StockService";
 import UserNavbar from "../sharedComponents/UserNavbar";
 import { toast } from "react-toastify";
+import Loader from "../sharedComponents/Loader";
 
 const StockDetailPage = () => {
   const { ticker } = useParams();
@@ -57,7 +58,7 @@ const StockDetailPage = () => {
     }
   };
 
-  if (loading) return <p className="text-center text-xl mt-10">Loading...</p>;
+  if (loading) return <Loader message="Fetching stock details..." />;;
   if (error) return <p className="text-center text-xl mt-10 text-red-500">{error}</p>;
 
   return (
