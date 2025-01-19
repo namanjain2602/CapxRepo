@@ -7,38 +7,25 @@ const FINNHUB_API_KEY = "ctsl7qpr01qin3c01ofgctsl7qpr01qin3c01og0";
  * Fetch the top profitable stocks from Finnhub.
  */
 export const fetchTopProfitableStocks = async () => {
-  const apiUrl = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${FINNHUB_API_KEY}`;
+  const apiUrl = `${BASE_URL}/recommendations`;
 
   try {
     const response = await axios.get(apiUrl);
-    const stockList = response.data.slice(0, 9); // Get the top 10 stocks
+    const stockDetails = response.data.map((stock) => ({
+      name: stock.name,
+      ticker: stock.ticker,
+      price: `$${stock.currentPrice.toFixed(2)}`,
+      change: `${stock.percentageChange.toFixed(2)}%`,
+      image: stock.logo, 
+    }));
 
-    const stockDetails = await Promise.all(
-      stockList.map(async (stock) => {
-        try {
-          const detailResponse = await axios.get(
-            `https://finnhub.io/api/v1/quote?symbol=${stock.symbol}&token=${FINNHUB_API_KEY}`
-          );
-          return {
-            name: stock.description,
-            ticker: stock.symbol,
-            price: `$${detailResponse.data.c.toFixed(2)}`,
-            change: `${((detailResponse.data.d / detailResponse.data.pc) * 100).toFixed(2)}%`,
-            image: `https://financialmodelingprep.com/image-stock/${stock.symbol}.png`,
-          };
-        } catch (error) {
-          console.error(`Error fetching details for ${stock.symbol}:`, error.message);
-          return null;
-        }
-      })
-    );
-
-    return stockDetails.filter((stock) => stock !== null); // Exclude null entries
+    return stockDetails;
   } catch (error) {
-    console.error("Error fetching stock list:", error.message);
+    console.error("Error fetching stock recommendations:", error.message);
     return [];
   }
 };
+
 
 /**
  * Fetch stock details from the backend.

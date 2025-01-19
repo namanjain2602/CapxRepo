@@ -15,8 +15,10 @@ import org.springframework.web.util.UriUtils;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class StockPriceService {
@@ -28,7 +30,10 @@ public class StockPriceService {
     private String apiBaseUrl;
 
 
-    private  RestTemplate restTemplate;
+    private RestTemplate restTemplate;
+
+    private List<StockDetailResponse> cachedRecommendations = null;
+
 
     public StockPriceService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -112,6 +117,33 @@ public class StockPriceService {
         }
     }
 
+    public List<String> getStockRecommendations() {
+        String apiUrl = UriComponentsBuilder.fromHttpUrl(apiBaseUrl).path("/stock/symbol")
+                .queryParam("exchange", "US")
+                .queryParam("token", apiKey)
+                .toUriString();
+
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            // Fetch the response as an array of Maps
+            Map<String, Object>[] response = restTemplate.getForObject(apiUrl, Map[].class);
+
+            // Extract ticker symbols from the response
+            List<String> tickerSymbols = new ArrayList<>();
+            if (response != null) {
+                for (Map<String, Object> stock : response) {
+                    if (stock.containsKey("symbol")) {
+                        tickerSymbols.add((String) stock.get("symbol"));
+                    }
+                }
+            }
+
+            // Limit the result to the first 9 ticker symbols
+            return tickerSymbols.subList(0, Math.min(tickerSymbols.size(), 9));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
 
 
 //    public class StockPriceResponse {
@@ -157,4 +189,5 @@ public class StockPriceService {
 //    }
 
 
+    }
 }

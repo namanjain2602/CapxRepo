@@ -76,14 +76,8 @@ public class StockController {
 
     @GetMapping("/info")
     public ResponseEntity<PortfolioDetailResponse> getStockInfo(@RequestParam String ticker) {
-        // Debug log to check the ticker received
-        //System.out.println("Received ticker: " + ticker);
-
-        // Service method to fetch stock info
-        PortfolioDetailResponse stockDetails = stockService.getStockInfo(ticker);
-
-        // Return the response as JSON
-        return ResponseEntity.ok(stockDetails);
+             PortfolioDetailResponse stockDetails = stockService.getStockInfo(ticker);
+             return ResponseEntity.ok(stockDetails);
     }
 }
 
