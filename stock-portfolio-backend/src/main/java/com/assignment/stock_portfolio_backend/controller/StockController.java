@@ -1,19 +1,18 @@
 package com.assignment.stock_portfolio_backend.controller;
 
 import com.assignment.stock_portfolio_backend.dto.PortfolioDetailResponse;
-import com.assignment.stock_portfolio_backend.dto.RecommendedStock;
 import com.assignment.stock_portfolio_backend.dto.StockDetailResponse;
+import com.assignment.stock_portfolio_backend.dto.StockRequestDto;
 import com.assignment.stock_portfolio_backend.dto.StockSearchResponse;
 import com.assignment.stock_portfolio_backend.model.Stock;
-import com.assignment.stock_portfolio_backend.service.RecommendationService;
-import com.assignment.stock_portfolio_backend.service.StockPriceService;
-import com.assignment.stock_portfolio_backend.service.StockService;
+import com.assignment.stock_portfolio_backend.service.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -31,24 +30,30 @@ public class StockController {
     private RecommendationService recommendationService;
 
     @PostMapping
-    public ResponseEntity<Stock> addStock(@RequestBody  Stock stock) {
-        return ResponseEntity.status(201).body(stockService.addStock(stock));
+    public ResponseEntity<Stock> addStock(
+            @RequestHeader("Authorization") String token,
+            @RequestBody StockRequestDto stock) {
+        String extractedToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        return ResponseEntity.status(201).body(stockService.addStock(stock, extractedToken));
     }
 
+
     @PutMapping("/{id}")
-    public ResponseEntity<Stock> updateStock(@PathVariable Long id, @RequestBody @Valid Stock stock) {
+    public ResponseEntity<Stock> updateStock(@PathVariable Long id, @RequestBody @Valid StockRequestDto stock) {
         return ResponseEntity.ok(stockService.updateStock(id, stock));
     }
 
     @DeleteMapping("/{ticker}/{quantity}")
-    public ResponseEntity<Void> deleteStock(@PathVariable String ticker, @PathVariable int quantity) {
-        stockService.deleteStock(ticker,quantity);
+    public ResponseEntity<Void> deleteStock(@RequestHeader("Authorization") String token, @PathVariable String ticker, @PathVariable int quantity) {
+        String extractedToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+
+        stockService.deleteStock(ticker,quantity,extractedToken);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<Stock>> getAllStocks() {
-        return ResponseEntity.ok(stockService.getAllStocks());
+    public ResponseEntity<List<Stock>> getAllStocks(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(stockService.getAllStocks(token));
     }
 
     @GetMapping("/portfolio-details")
@@ -75,8 +80,9 @@ public class StockController {
     }
 
     @GetMapping("/info")
-    public ResponseEntity<PortfolioDetailResponse> getStockInfo(@RequestParam String ticker) {
+    public ResponseEntity<PortfolioDetailResponse> getStockInfo(@RequestParam String ticker) throws JsonProcessingException {
              PortfolioDetailResponse stockDetails = stockService.getStockInfo(ticker);
+        System.out.println("Serialized JSON: " + new ObjectMapper().writeValueAsString(stockDetails));
              return ResponseEntity.ok(stockDetails);
     }
 }

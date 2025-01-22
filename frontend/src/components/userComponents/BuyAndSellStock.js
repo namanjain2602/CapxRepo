@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   fetchPurchasedStockInfo,
   buyStock,
@@ -13,7 +13,6 @@ import "react-toastify/dist/ReactToastify.css";
 const BuyAndSellStock = () => {
   const { id } = useParams();
   const [stock, setStock] = useState(null);
-  const [logoUrl, setLogoUrl] = useState("");
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
@@ -22,9 +21,6 @@ const BuyAndSellStock = () => {
         const stockDetails = await fetchPurchasedStockInfo(id);
         setStock(stockDetails);
 
-        // Fetch logo URL based on stock ticker
-        const logoApiUrl = `https://logo.clearbit.com/${stockDetails.ticker.toLowerCase()}.com`;
-        setLogoUrl(logoApiUrl);
       } catch (err) {
         toast.error("Failed to fetch stock details.");
       }
@@ -84,9 +80,10 @@ const BuyAndSellStock = () => {
       <main className="flex-grow container mx-auto px-0 py-20">
         <div className="bg-white shadow-lg rounded-lg p-6 max-w-2xl mx-auto">
           <img
-            src={logoUrl}
-            alt={`${stock.stockName}`}
-            onError={() => setLogoUrl("/images/placeholder-logo.png")} // Fallback to placeholder
+            src={ stock.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              stock.stockName || "Stock"
+            )}&background=random`}
+            alt={stock.stockName || "Stock Logo"}
             className="w-32 h-32 mx-auto mb-4 rounded-full border shadow-sm"
           />
           <h1 className="text-2xl font-bold text-center mb-4">{stock.stockName}</h1>

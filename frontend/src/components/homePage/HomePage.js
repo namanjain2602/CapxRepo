@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchTopProfitableStocks } from "../../services/StockService";
-import StockCard from "../StockCard";
-import StockDetail from "../StockDetail";
+import StockCard from "../stockComponents/StockCard";
+import StockDetail from "../stockComponents/StockDetail";
 import Loader from "../../sharedComponents/Loader";
 import Error from "../../sharedComponents/Error";
 import Navbar from "../../sharedComponents/Navbar";
@@ -13,26 +13,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Function to fetch logo by ticker
-  const fetchLogoByTicker = async (ticker, stockName) => {
-    try {
-      const logoApiUrl = `https://logo.clearbit.com/${ticker.toLowerCase()}.com`;
-      const response = await fetch(logoApiUrl);
-      if (response.ok) {
-        return logoApiUrl;
-      } else {
-        // Fallback to ui-avatars
-        return `https://ui-avatars.com/api/?name=${encodeURIComponent(
-          stockName
-        )}&background=random`;
-      }
-    } catch (err) {
-      // Fallback to ui-avatars
-      return `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        stockName
-      )}&background=random`;
-    }
-  };
+
 
   useEffect(() => {
     const loadStocks = async () => {
@@ -42,15 +23,7 @@ const HomePage = () => {
 
         const data = await fetchTopProfitableStocks();
 
-        // Fetch logos for each stock
-        const stocksWithLogos = await Promise.all(
-          data.map(async (stock) => {
-            const logoUrl = await fetchLogoByTicker(stock.ticker, stock.name);
-            return { ...stock, image: logoUrl };
-          })
-        );
-
-        setStocks(stocksWithLogos);
+        setStocks(data);
       } catch (err) {
         setError("Failed to fetch stock data.");
       } finally {

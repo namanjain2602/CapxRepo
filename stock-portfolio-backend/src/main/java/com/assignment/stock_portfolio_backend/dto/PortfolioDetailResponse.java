@@ -15,10 +15,11 @@ public class PortfolioDetailResponse {
     private BigDecimal profitLossPercentage;
     private BigDecimal priceChangeAmount;
     private BigDecimal priceChangePercentage;
+    private String image;
 
     // Getters and Setter
     public PortfolioDetailResponse(String stockName, String ticker, BigDecimal purchasePrice, BigDecimal currentPrice,
-                                   BigDecimal quantity) {
+                                   BigDecimal quantity, String image) {
         this.stockName = stockName;
         this.ticker = ticker;
         this.purchasePrice = purchasePrice;
@@ -32,6 +33,9 @@ public class PortfolioDetailResponse {
         this.priceChangeAmount = currentPrice.subtract(purchasePrice);
         this.priceChangePercentage = purchasePrice.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO :
                 priceChangeAmount.divide(purchasePrice, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal.valueOf(100));
+        this.image=image;
+        System.out.println("Constructor called. Image: " + image);
+
     }
 
 
@@ -125,6 +129,10 @@ public class PortfolioDetailResponse {
     public void setPriceChangePercentage(BigDecimal priceChangePercentage) {
         this.priceChangePercentage = priceChangePercentage;
     }
+    public String getImage() {
+        return image;
+    }
+
 
     @Override
     public String toString() {
@@ -140,6 +148,7 @@ public class PortfolioDetailResponse {
                 ", profitLossPercentage=" + profitLossPercentage +
                 ", priceChangeAmount=" + priceChangeAmount +
                 ", priceChangePercentage=" + priceChangePercentage +
+                ", Image=" + image +
                 '}';
     }
 }

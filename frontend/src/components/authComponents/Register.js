@@ -1,60 +1,59 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { registerUser } from "../../services/UserService";
+import { toast } from "react-toastify";
 
 const Register = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    firstName: "",
+    lastName: "",
+    username: "",
     password: "",
-    mobile: "",
+    email: "",
+    mobileNumber: "",
+    gender: "",
+    dateOfBirth: "",
   });
+
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    // Hardcoded user registration data
-    const hardcodedUser = {
-      name: "Naman",
-      email: "naman@gmail.com",
-      password: "Naman",
-      mobile: "1234567890",
-    };
-
-    // Save hardcoded user to local storage (if not already saved)
-    if (!localStorage.getItem("users")) {
-      localStorage.setItem("users", JSON.stringify([hardcodedUser]));
-    }
-  }, []);
+  const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    // Check if email or mobile already exists
-    const existingUser = users.find(
-      (user) => user.email === formData.email || user.mobile === formData.mobile
-    );
-    if (existingUser) {
-      setMessage("Email or Mobile number already registered!");
-      return;
-    }
-
-    // Add new user to local storage
-    const updatedUsers = [...users, formData];
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    setMessage("User registered successfully!");
-    setFormData({ name: "", email: "", password: "", mobile: "" }); // Clear form
+    setMessage("");
+    setError("");
+  
+    try {
+      
+      
+      const response = await registerUser(formData, "user"); // Call the service method
+    toast.success("User registered successfully!");
+  
+    setFormData({
+      firstName: "",
+      lastName: "",
+      username: "",
+      password: "",
+      email: "",
+      mobileNumber: "",
+      gender: "",
+      dateOfBirth: "",
+    }); // Clear form
+  } catch (err) {
+    toast.error(err.message);
+  }
   };
+  
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
-        {/* Close Icon */}
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition focus:outline-none"
@@ -76,12 +75,40 @@ const Register = ({ isOpen, onClose }) => {
         </button>
         <h2 className="text-xl font-bold mb-4">Register</h2>
         {message && <p className="mb-4 text-green-600">{message}</p>}
+        {error && <p className="mb-4 text-red-600">{error}</p>}
         <form onSubmit={handleSubmit}>
           <input
             type="text"
-            name="name"
-            placeholder="Name"
-            value={formData.name}
+            name="firstName"
+            placeholder="First Name"
+            value={formData.firstName}
+            onChange={handleInputChange}
+            className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
+          <input
+            type="text"
+            name="lastName"
+            placeholder="Last Name"
+            value={formData.lastName}
+            onChange={handleInputChange}
+            className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={handleInputChange}
+            className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
             onChange={handleInputChange}
             className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
@@ -97,18 +124,31 @@ const Register = ({ isOpen, onClose }) => {
           />
           <input
             type="text"
-            name="mobile"
+            name="mobileNumber"
             placeholder="Mobile Number"
-            value={formData.mobile}
+            value={formData.mobileNumber}
             onChange={handleInputChange}
             className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleInputChange}
+            className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            required
+          >
+            <option value="" disabled>
+              Select Gender
+            </option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHERS">Others</option>
+          </select>
           <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
+            type="date"
+            name="dateOfBirth"
+            value={formData.dateOfBirth}
             onChange={handleInputChange}
             className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             required

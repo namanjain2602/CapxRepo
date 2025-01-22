@@ -3,13 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { fetchStocks } from "../services/StockService";
 import { toast } from "react-toastify";
 import Profile from "../components/userComponents/Profile";
+import { logoutUser } from "../services/UserService";
 
 
 const UserNavbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("logged"));
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [profileModal, setProfileModal] = useState(false);
   const navigate = useNavigate();
 
@@ -40,17 +41,30 @@ const UserNavbar = () => {
     return () => clearTimeout(debounceTimer);
   }, [searchTerm]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (!isLoggedIn) {
       toast.error("You are already logged out. Please log in first.");
       navigate("/");
       return;
     }
 
-    localStorage.removeItem("logged");
-    setIsLoggedIn(false);
-    toast.success("You have successfully logged out.");
-    navigate("/");
+    try {
+      const accessToken = localStorage.getItem("token"); // Retrieve the token from localStorage
+
+      // Call the logout API
+      await logoutUser(accessToken);
+
+
+      // Remove token and update state
+      localStorage.removeItem("logged");
+      localStorage.removeItem("token");
+      setIsLoggedIn(false);
+      toast.success("You have successfully logged out.");
+      navigate("/");
+    } catch (error) {
+      console.error("Error logging out:", error.message);
+      toast.error("Failed to log out. Please try again.");
+    }
   };
 
   const handleViewProfile = () => {
@@ -67,6 +81,9 @@ const UserNavbar = () => {
           </span>
           <span>CapGro</span>
         </Link>
+
+
+
 
         {/* Search Bar */}
         <div className="relative w-full max-w-lg">
@@ -100,6 +117,10 @@ const UserNavbar = () => {
         {/* Navigation Links */}
         <div className="flex space-x-6 items-center">
           {/* My Stocks */}
+          <Link to="/user-dashboard" className="text-gray-300 hover:text-blue-500 font-medium transition">
+
+            <span>Home</span>
+          </Link>
           <Link
             to="/user-dashboard/my-stocks"
             className="text-gray-300 hover:text-blue-500 font-medium transition"
@@ -108,20 +129,20 @@ const UserNavbar = () => {
           </Link>
 
           {/* Profile Dropdown */}
-              <div className="relative group">
-      <span
-        onClick={handleViewProfile}
-        className="text-gray-300 cursor-pointer hover:text-gray-400 font-semibold transition"
-      >
-        Profile
-      </span>
-    </div>
-    <span
-  onClick={handleLogout}
-  className="text-gray-300 cursor-pointer hover:text-red-700 font-medium transition"
->
-  Logout
-</span>
+          <div className="relative group">
+            <span
+              onClick={handleViewProfile}
+              className="text-gray-300 cursor-pointer hover:text-gray-400 font-semibold transition"
+            >
+              Profile
+            </span>
+          </div>
+          <span
+            onClick={handleLogout}
+            className="text-gray-300 cursor-pointer hover:text-red-700 font-medium transition"
+          >
+            Logout
+          </span>
         </div>
       </nav>
 

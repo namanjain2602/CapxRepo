@@ -1,25 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { fetchLoggedUser } from "../../services/UserService";
+// Adjust path as needed
 
 const Profile = ({ onClose }) => {
   const [profileDetails, setProfileDetails] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
+    username: "",
     email: "",
-    mobile: "",
+    mobileNumber: "",
+    gender: "",
+    dateOfBirth: "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    const storedDetails = JSON.parse(localStorage.getItem("users")) || [];
-    if (storedDetails.length > 0) {
-      // Access the first user in the array
-      setProfileDetails({
-        name: storedDetails[0].name || "",
-        email: storedDetails[0].email || "",
-        mobile: storedDetails[0].mobile || "",
-      });
+    const accessToken = localStorage.getItem("token"); // Assume token is stored in localStorage
+    if (!accessToken) {
+      toast.error("User is not logged in.");
+      return;
     }
+
+    const fetchProfile = async () => {
+      try {
+        const data = await fetchLoggedUser(accessToken);
+        setProfileDetails(data);
+      } catch (error) {
+        toast.error("Failed to fetch profile details.");
+      }
+    };
+
+    fetchProfile();
   }, []);
 
   const handleInputChange = (e) => {
@@ -28,64 +41,72 @@ const Profile = ({ onClose }) => {
   };
 
   const handleSave = () => {
-    // Save the updated profile details back to localStorage
-    const storedDetails = JSON.parse(localStorage.getItem("users")) || [];
-    if (storedDetails.length > 0) {
-      storedDetails[0] = { ...storedDetails[0], ...profileDetails };
-      localStorage.setItem("users", JSON.stringify(storedDetails));
-    }
+    toast.info("Save functionality not implemented yet.");
     setIsEditing(false);
-    toast.success("Profile updated successfully!");
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          User Profile
-        </h2>
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">User Profile</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-gray-600 font-medium">Name</label>
+            <label className="block text-gray-600 font-medium">First Name</label>
             {isEditing ? (
               <input
                 type="text"
-                name="name"
-                value={profileDetails.name}
+                name="firstName"
+                value={profileDetails.firstName}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-gray-400"
               />
             ) : (
-              <p>{profileDetails.name || "N/A"}</p>
+              <p>{profileDetails.firstName || "N/A"}</p>
             )}
           </div>
           <div>
-            <label className="block text-gray-600 font-medium">Email</label>
+            <label className="block text-gray-600 font-medium">Last Name</label>
             {isEditing ? (
               <input
-                type="email"
-                name="email"
-                value={profileDetails.email}
+                type="text"
+                name="lastName"
+                value={profileDetails.lastName}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-gray-400"
               />
             ) : (
-              <p>{profileDetails.email || "N/A"}</p>
+              <p>{profileDetails.lastName || "N/A"}</p>
             )}
+          </div>
+          <div>
+            <label className="block text-gray-600 font-medium">Username</label>
+            <p>{profileDetails.username || "N/A"}</p>
+          </div>
+          <div>
+            <label className="block text-gray-600 font-medium">Email</label>
+            <p>{profileDetails.email || "N/A"}</p>
           </div>
           <div>
             <label className="block text-gray-600 font-medium">Mobile</label>
             {isEditing ? (
               <input
                 type="text"
-                name="mobile"
-                value={profileDetails.mobile}
+                name="mobileNumber"
+                value={profileDetails.mobileNumber}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-gray-400"
               />
             ) : (
-              <p>{profileDetails.mobile || "N/A"}</p>
+              <p>{profileDetails.mobileNumber || "N/A"}</p>
             )}
+          </div>
+          <div>
+            <label className="block text-gray-600 font-medium">Gender</label>
+            <p>{profileDetails.gender || "N/A"}</p>
+          </div>
+          <div>
+            <label className="block text-gray-600 font-medium">Date of Birth</label>
+            <p>{profileDetails.dateOfBirth || "N/A"}</p>
           </div>
         </div>
         <div className="mt-6 flex justify-between">

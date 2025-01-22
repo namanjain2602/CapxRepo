@@ -4,6 +4,7 @@ import { fetchPurchasedStocks } from "../../services/StockService";
 import UserNavbar from "../../sharedComponents/UserNavbar";
 import Footer from "../../sharedComponents/Footer";
 import Loader from "../../sharedComponents/Loader";
+import { toast } from "react-toastify";
 
 const MyStocks = () => {
   const [stocks, setStocks] = useState([]);
@@ -14,21 +15,12 @@ const MyStocks = () => {
   // Method to fetch logo dynamically
   const fetchLogoByTicker = async (ticker, stockName) => {
     try {
-      const logoApiUrl = `https://logo.clearbit.com/${ticker.toLowerCase()}.com`;
-      const response = await fetch(logoApiUrl);
-      if (response.ok) {
-        return logoApiUrl;
-      } else {
-        // Fallback to ui-avatars
-        return `https://ui-avatars.com/api/?name=${encodeURIComponent(
-          stockName
-        )}&background=random`;
-      }
-    } catch (err) {
-      // Fallback to ui-avatars
       return `https://ui-avatars.com/api/?name=${encodeURIComponent(
         stockName
       )}&background=random`;
+
+    } catch (err) {
+      toast.error(err.message)
     }
   };
 
@@ -36,7 +28,8 @@ const MyStocks = () => {
     const fetchStocks = async () => {
       try {
         const purchasedStocks = await fetchPurchasedStocks();
-
+        console.log(purchasedStocks);
+        
         // Add dynamic logo fetching for each stock
         const stocksWithLogos = await Promise.all(
           purchasedStocks.map(async (stock) => {
@@ -82,17 +75,18 @@ const MyStocks = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {stocks.map((stock) => (
-              <div
+              <Link
                 key={stock.id}
+                to={`/stocks/${stock.ticker}`}
                 className="bg-gradient-to-r from-gray-100 to-gray-50 shadow-lg rounded-lg p-6 flex flex-col items-center transform transition-transform hover:scale-105"
               >
                 <img
                   src={stock.logo}
                   alt={`${stock.stockName} logo`}
                   onError={(e) =>
-                    (e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      stock.stockName
-                    )}&background=random`)
+                  (e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    stock.stockName
+                  )}&background=random`)
                   }
                   className="w-20 h-20 mb-4 rounded-full border border-gray-300 shadow-sm"
                 />
@@ -102,17 +96,7 @@ const MyStocks = () => {
                   Buy Price: ${stock.buyPrice.toFixed(2)}
                 </p>
                 <p className="text-gray-500">Quantity: {stock.quantity}</p>
-
-                {/* View Button */}
-                <div className="mt-4">
-                  <Link
-                    to={`/stocks/${stock.ticker}`}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-md"
-                  >
-                    View
-                  </Link>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

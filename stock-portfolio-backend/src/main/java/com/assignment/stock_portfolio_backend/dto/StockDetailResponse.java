@@ -1,8 +1,11 @@
 package com.assignment.stock_portfolio_backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.ToString;
+
 import java.math.BigDecimal;
 
+@ToString
 public class StockDetailResponse {
 
     @JsonProperty("ticker")
@@ -33,19 +36,19 @@ public class StockDetailResponse {
     private BigDecimal priceChange;
     private BigDecimal percentageChange;
 
-    public StockDetailResponse() {
-        this.ticker = "No Data Found";
-        this.name = "No Data Found";
-        this.exchange = "No Data Found";
-        this.ipoDate = "No Date Found";
-        this.marketCapitalization = 0.0;
-        this.website = "No Data";
-        this.logo = "No Image Found";
-        this.industry = "No Industry Found";
-        this.currentPrice = new BigDecimal(0);
-        this.priceChange = new BigDecimal(0);
-        this.percentageChange = new BigDecimal(0);
-    }
+//    public StockDetailResponse() {
+//        this.ticker = "No Data Found";
+//        this.name = "No Data Found";
+//        this.exchange = "No Data Found";
+//        this.ipoDate = "No Date Found";
+//        this.marketCapitalization = 0.0;
+//        this.website = "No Data";
+//        this.logo = "No Image Found";
+//        this.industry = "No Industry Found";
+//        this.currentPrice = new BigDecimal(0);
+//        this.priceChange = new BigDecimal(0);
+//        this.percentageChange = new BigDecimal(0);
+//    }
 
     public StockDetailResponse(String ticker, String name, double currentPrice, double priceChange, double percentageChange, String logo) {
         this.ticker = ticker;

@@ -14,9 +14,9 @@ export const fetchTopProfitableStocks = async () => {
     const stockDetails = response.data.map((stock) => ({
       name: stock.name,
       ticker: stock.ticker,
-      price: `$${stock.currentPrice.toFixed(2)}`,
+      price: `${stock.currentPrice.toFixed(2)}`,
       change: `${stock.percentageChange.toFixed(2)}%`,
-      image: stock.logo, 
+      image: stock.logo,
     }));
 
     return stockDetails;
@@ -78,9 +78,7 @@ export const fetchStocks = async (query) => {
   }
 };
 
-/**
- * Fetch recommended stocks from the backend.
- */
+
 export const fetchRecommendedStocks = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/recommendations`);
@@ -96,7 +94,11 @@ export const fetchRecommendedStocks = async () => {
  */
 export const buyStock = async (stockData) => {
   try {
-    const response = await axios.post(BASE_URL, stockData);
+    const token = localStorage.getItem("token");
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    const response = await axios.post(BASE_URL, stockData, { headers });
     return response.data;
   } catch (error) {
     console.error("Error buying stock:", error.message);
@@ -108,8 +110,16 @@ export const buyStock = async (stockData) => {
  * Sell a stock by sending a request to the backend.
  */
 export const sellStock = async (ticker, quantity) => {
+  const token = localStorage.getItem("token");
   try {
-    const response = await axios.delete(`${BASE_URL}/${ticker}/${quantity}`);
+    const response = await axios.delete(
+      `${BASE_URL}/${ticker}/${quantity}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error(`Error selling stock (${ticker}):`, error.message);
@@ -121,14 +131,22 @@ export const sellStock = async (ticker, quantity) => {
  * Fetch purchased stocks from the backend.
  */
 export const fetchPurchasedStocks = async () => {
+  const accessToken = localStorage.getItem("token")
+
   try {
-    const response = await axios.get(BASE_URL);
+    const response = await axios.get(BASE_URL, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
     return response.data;
   } catch (error) {
     console.error("Error fetching purchased stocks:", error.message);
     throw error;
   }
 };
+
 
 /**
  * Fetch the current price of a stock.
@@ -152,6 +170,8 @@ export const fetchPurchasedStockInfo = async (ticker) => {
   try {
     // Sending ticker as a request parameter
     const response = await axios.get(`${BASE_URL}/info`, { params: { ticker } });
+    console.log(response.data);
+    
     return response.data; // Return the data received from the backend
   } catch (error) {
     console.error(`Error fetching stock info for ${ticker}:`, error.message);
@@ -160,18 +180,5 @@ export const fetchPurchasedStockInfo = async (ticker) => {
 };
 
 
-const fetchLogoByTicker = async (ticker) => {
-  try {
-    const logoApiUrl = `https://logo.clearbit.com/${ticker.toLowerCase()}.com`;
-    const response = await fetch(logoApiUrl);
-    if (response.ok) {
-      return logoApiUrl;
-    } else {
-      return "https://via.placeholder.com/150"; // Fallback image
-    }
-  } catch (err) {
-    return "https://via.placeholder.com/150"; // Fallback image
-  }
-};
 
 

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Navbar from "../sharedComponents/Navbar";
-import Footer from "../sharedComponents/Footer";
-import { fetchStockDetails, buyStock } from "../services/StockService";
-import UserNavbar from "../sharedComponents/UserNavbar";
+import Navbar from "../../sharedComponents/Navbar";
+import Footer from "../../sharedComponents/Footer";
+import { fetchStockDetails, buyStock } from "../../services/StockService";
+import UserNavbar from "../../sharedComponents/UserNavbar";
 import { toast } from "react-toastify";
-import Loader from "../sharedComponents/Loader";
+import Loader from "../../sharedComponents/Loader";
 
 const StockDetailPage = () => {
   const { ticker } = useParams();
@@ -32,20 +32,26 @@ const StockDetailPage = () => {
   }, [ticker]);
 
   const handleBuy = async () => {
-    const isLoggedIn = localStorage.getItem("logged") === "user";
+ 
+    const isLoggedIn = localStorage.getItem("logged") === "ROLE_USER";
+
     if (!isLoggedIn) {
       toast.warn("Please log in first to buy stocks.");
+
       //navigate("/login"); // Redirect to login page
       return;
     }
 
-    if (!stock) return;
 
+
+    if (!stock) return;
+    
     const buyData = {
       stockName: stock.name,
       ticker: stock.ticker,
       buyPrice: stock.currentPrice,
       quantity: quantity,
+      image: stock.logo,
     };
 
     try {
@@ -63,7 +69,7 @@ const StockDetailPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {localStorage.getItem("logged") === "user" ? <UserNavbar /> : <Navbar />}
+      {localStorage.getItem("logged") === "ROLE_USER" ? <UserNavbar /> : <Navbar />}
       <main className="flex-grow container mx-auto px-0 py-20">
         <div className="flex flex-col items-center bg-white shadow-lg rounded-lg p-8">
           {/* Stock Logo */}
@@ -75,43 +81,43 @@ const StockDetailPage = () => {
             />
           </div>
 
-         {/* Stock Details */}
-<div className="text-center space-y-4">
-  {/* Stock Name and Ticker */}
-  <h1 className="text-4xl font-bold text-gray-800">
-    {stock.name} <span className="text-gray-600">({stock.ticker})</span>
-  </h1>
-  
-  {/* Industry */}
-  <p className="text-xl text-gray-600">{stock.finnhubIndustry}</p>
-  
-  {/* Current Stock Price */}
-  <div className="text-2xl font-semibold">
-    <p className="text-green-1000">
-      Current Stock Price: <span>${stock.currentPrice.toFixed(2)}</span>
-    </p>
-    
-    {/* Total Amount */}
-    <p className="text-blue-600">
-      Total Amount: <span>${(stock.currentPrice * quantity).toFixed(2)}</span>
-    </p>
-  </div>
-  
-  {/* Price Change and Percentage */}
-  <p className="text-sm text-gray-500">
-    Change: 
-    <span className="text-blue-600"> ${stock.priceChange.toFixed(2)}</span> 
-    (<span
-      className={
-        stock.percentageChange >= 0
-          ? "text-green-500"
-          : "text-red-500"
-      }
-    >
-      {stock.percentageChange.toFixed(2)}%
-    </span>)
-  </p>
-</div>
+          {/* Stock Details */}
+          <div className="text-center space-y-4">
+            {/* Stock Name and Ticker */}
+            <h1 className="text-4xl font-bold text-gray-800">
+              {stock.name} <span className="text-gray-600">({stock.ticker})</span>
+            </h1>
+
+            {/* Industry */}
+            <p className="text-xl text-gray-600">{stock.finnhubIndustry !== "N/A" ? stock.finnhubIndustry : ""}</p>
+
+            {/* Current Stock Price */}
+            <div className="text-2xl font-semibold">
+              <p className="text-green-1000">
+                Current Stock Price: <span>${stock.currentPrice.toFixed(2)}</span>
+              </p>
+
+              {/* Total Amount */}
+              <p className="text-blue-600">
+                Total Amount: <span>${(stock.currentPrice * quantity).toFixed(2)}</span>
+              </p>
+            </div>
+
+            {/* Price Change and Percentage */}
+            <p className="text-sm text-gray-500">
+              Change:
+              <span className="text-blue-600"> ${stock.priceChange.toFixed(2)}</span>
+              (<span
+                className={
+                  stock.percentageChange >= 0
+                    ? "text-green-500"
+                    : "text-red-500"
+                }
+              >
+                {stock.percentageChange.toFixed(2)}%
+              </span>)
+            </p>
+          </div>
 
           <p className="text-sm mt-2 text-gray-500">
             <b>Market Capitalization: </b>${stock.marketCapitalization.toFixed(2)}M
@@ -125,7 +131,7 @@ const StockDetailPage = () => {
             Visit Company Website
           </a>
 
-                  {/* Quantity Selector */}
+          {/* Quantity Selector */}
           <div className="flex items-center mt-6 space-x-4">
             {/* Decrement Button */}
             <button
