@@ -14,7 +14,7 @@ public interface StockService {
 
     void deleteStock(String ticker, int quantity, String extractedToken);
 
-    List<Stock> getAllStocks(String token);
+    List<StockRequestDto> getAllStocks(String token);
 
     List<PortfolioDetailResponse> calculatePortfolioDetails();
 

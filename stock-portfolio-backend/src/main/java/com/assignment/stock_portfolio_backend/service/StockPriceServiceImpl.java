@@ -7,6 +7,7 @@ import com.assignment.stock_portfolio_backend.dto.StockSearchResponseWrapper;
 import com.assignment.stock_portfolio_backend.exception.StockException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
@@ -92,35 +93,35 @@ public class StockPriceServiceImpl implements StockPriceService {
     @Override
     public StockDetailResponse getStockDetails(String ticker) {
 
-            String encodedTicker = ticker.replace(".","%2E");
-            String profileUrl = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
-                    .path("/stock/profile2")
-                    .queryParam("symbol", encodedTicker)
-                    .queryParam("token", apiKey)
-                    .toUriString();
-            //System.out.println("Profile Url "+profileUrl);
-            StockDetailResponse stockDetails = restTemplate.getForObject(profileUrl, StockDetailResponse.class);
+        String encodedTicker = ticker.replace(".", "%2E");
+        String profileUrl = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
+                .path("/stock/profile2")
+                .queryParam("symbol", encodedTicker)
+                .queryParam("token", apiKey)
+                .toUriString();
+        //System.out.println("Profile Url "+profileUrl);
+        StockDetailResponse stockDetails = restTemplate.getForObject(profileUrl, StockDetailResponse.class);
 
-            // Fetch real-time price data
-            String priceUrl = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
-                    .path("/quote")
-                    .queryParam("symbol", encodedTicker)
-                    .queryParam("token", apiKey)
-                    .toUriString();
+        // Fetch real-time price data
+        String priceUrl = UriComponentsBuilder.fromHttpUrl(apiBaseUrl)
+                .path("/quote")
+                .queryParam("symbol", encodedTicker)
+                .queryParam("token", apiKey)
+                .toUriString();
 
-            //System.out.println("Price Url "+priceUrl);
+        //System.out.println("Price Url "+priceUrl);
 
-            StockPriceResponse priceResponse = restTemplate.getForObject(priceUrl, StockPriceResponse.class);
-            if (stockDetails != null && priceResponse != null) {
-                stockDetails.setCurrentPrice(priceResponse.getCurrentPrice());
-                stockDetails.setPriceChange(priceResponse.getChange());
-                stockDetails.setPercentageChange(priceResponse.getPercentageChange());
-                stockDetails.setTicker(ticker);
-                //check(stockDetails);
-                return stockDetails;
-            } else {
-                throw new StockException("Failed to fetch details for ticker: " + ticker);
-            }
+        StockPriceResponse priceResponse = restTemplate.getForObject(priceUrl, StockPriceResponse.class);
+        if (stockDetails != null && priceResponse != null) {
+            stockDetails.setCurrentPrice(priceResponse.getCurrentPrice());
+            stockDetails.setPriceChange(priceResponse.getChange());
+            stockDetails.setPercentageChange(priceResponse.getPercentageChange());
+            stockDetails.setTicker(ticker);
+            //check(stockDetails);
+            return stockDetails;
+        } else {
+            throw new StockException("Failed to fetch details for ticker: " + ticker);
+        }
 
     }
 
@@ -132,36 +133,32 @@ public class StockPriceServiceImpl implements StockPriceService {
                 .queryParam("token", apiKey)
                 .toUriString();
 
-        RestTemplate restTemplate = new RestTemplate();
         try {
-            // Fetch the response as an array of Maps
             Map<String, Object>[] response = restTemplate.getForObject(apiUrl, Map[].class);
 
-            // Extract ticker symbols from the response
             List<String> tickerSymbols = new ArrayList<>();
             if (response != null) {
                 for (Map<String, Object> stock : response) {
                     if (stock.containsKey("symbol")) {
                         String symbol = (String) stock.get("symbol");
-                        // Exclude symbols containing "."
                         if (!symbol.contains(".")) {
-
                             tickerSymbols.add(symbol);
                         }
                     }
                 }
             }
 
-            // Limit the result to the first 9 ticker symbols
-            //System.out.println(tickerSymbols);
-            List<String >lst=tickerSymbols.subList(0, Math.min(tickerSymbols.size(), 25));
-            //System.out.println(lst);
-            return lst;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            return tickerSymbols.subList(0, Math.min(tickerSymbols.size(), 25));
+        } catch (RestClientException e) {
+            // Detect rate-limiting errors (e.g., HTTP 429)
+            if (e.getMessage().contains("429") || e.getMessage().contains("Rate limit")) {
+                throw new StockException("API rate limit exceeded. Please try again later.");
+            }
+            throw new StockException("Error occurred while fetching stock recommendations");
         }
+
     }
+}
 
 
 //    public class StockPriceResponse {
@@ -207,4 +204,4 @@ public class StockPriceServiceImpl implements StockPriceService {
 //    }
 
 
-    }
+

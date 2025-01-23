@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../sharedComponents/Navbar";
 import Footer from "../../sharedComponents/Footer";
@@ -15,6 +15,8 @@ const StockDetailPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const hasFetched = useRef(false);
+
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -28,7 +30,11 @@ const StockDetailPage = () => {
       }
     };
 
-    fetchDetails();
+    if(!hasFetched.current){
+      hasFetched.current=true;
+      fetchDetails();
+    }
+    
   }, [ticker]);
 
   const handleBuy = async () => {

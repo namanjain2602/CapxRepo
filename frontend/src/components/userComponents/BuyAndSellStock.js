@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
   fetchPurchasedStockInfo,
@@ -14,6 +14,7 @@ const BuyAndSellStock = () => {
   const { id } = useParams();
   const [stock, setStock] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     const fetchStockDetails = async () => {
@@ -25,18 +26,24 @@ const BuyAndSellStock = () => {
         toast.error("Failed to fetch stock details.");
       }
     };
-
-    fetchStockDetails();
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      fetchStockDetails();
+    }
   }, [id]);
 
   const handleBuy = async () => {
+    
+    
     try {
       const payload = {
         stockName: stock.stockName,
         ticker: stock.ticker,
         buyPrice: stock.currentPrice,
         quantity: quantity,
+        image: stock.image,
       };
+
       await buyStock(payload);
       toast.success(`${quantity} shares of ${stock.stockName} bought successfully!`);
       setStock((prev) => ({
@@ -80,7 +87,7 @@ const BuyAndSellStock = () => {
       <main className="flex-grow container mx-auto px-0 py-20">
         <div className="bg-white shadow-lg rounded-lg p-6 max-w-2xl mx-auto">
           <img
-            src={ stock.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(
+            src={stock.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(
               stock.stockName || "Stock"
             )}&background=random`}
             alt={stock.stockName || "Stock Logo"}

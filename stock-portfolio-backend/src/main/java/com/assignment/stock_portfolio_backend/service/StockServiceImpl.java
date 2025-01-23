@@ -18,6 +18,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StockServiceImpl implements StockService {
@@ -61,6 +62,7 @@ public class StockServiceImpl implements StockService {
         }
 
         Stock existingStock = stk.get();
+        existingStock.setImage(stockRequestDto.getImage());
         int existingQuantity = existingStock.getQuantity();
         BigDecimal existingPrice = existingStock.getBuyPrice();
         int newQuantity = stock.getQuantity();
@@ -144,7 +146,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<Stock> getAllStocks(String token) {
+    public List<StockRequestDto> getAllStocks(String token) {
         //System.out.println(token);
         Token tokenObject = tokenRepository.findByToken(token.substring(7))
                 .orElseThrow(() -> new UserRelatedException("Token cannot be found"));
@@ -157,7 +159,21 @@ public class StockServiceImpl implements StockService {
         if (user == null) {
             throw new UserRelatedException("User not found");
         }
-        return user.getStocks();
+        List<StockRequestDto> stockRequestDtos = user.getStocks()
+                .stream()
+                .map(stock -> {
+                    StockRequestDto dto = new StockRequestDto();
+                    dto.setStockName(stock.getStockName());
+                    dto.setQuantity(stock.getQuantity());
+                    dto.setImage(stock.getImage());
+                    dto.setBuyPrice(stock.getBuyPrice());
+                    dto.setTicker(stock.getTicker());
+                    dto.setCurrentPrice(stockPriceService
+                            .fetchCurrentStockPrice(stock.getTicker()));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        return stockRequestDtos;
     }
 
     @Override

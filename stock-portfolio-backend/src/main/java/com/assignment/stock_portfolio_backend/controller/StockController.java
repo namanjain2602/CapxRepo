@@ -52,7 +52,7 @@ public class StockController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Stock>> getAllStocks(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<List<StockRequestDto>> getAllStocks(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(stockService.getAllStocks(token));
     }
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import StockCard from "../stockComponents/StockCard";
 import { fetchPurchasedStocks, fetchRecommendedStocks } from "../../services/StockService";
 import UserNavbar from "../../sharedComponents/UserNavbar";
@@ -13,6 +13,8 @@ const UserDashboard = () => {
 
   const [visibleCount, setVisibleCount] = useState(3);
 
+  const hasFetched = useRef(false);
+
   const handleToggleView = () => {
     setVisibleCount((prev) =>
       prev < recommendedStocks.length - 2 ? prev + 3 : 3
@@ -20,7 +22,7 @@ const UserDashboard = () => {
   };
 
   useEffect(() => {
-    
+
     const loadDashboardData = async () => {
       try {
         setLoading(true);
@@ -28,7 +30,7 @@ const UserDashboard = () => {
         const purchasedStocks = await fetchPurchasedStocks();
 
         //console.log(purchasedStocks);
-        
+
         setPortfolio(purchasedStocks);
 
         // Fetch recommended stocks from API
@@ -46,7 +48,11 @@ const UserDashboard = () => {
       }
     };
 
-    loadDashboardData();
+    if (!hasFetched.current) {
+      hasFetched.current = true; // Mark as fetched
+      loadDashboardData();
+    }
+
   }, []);
 
   return (
@@ -60,17 +66,18 @@ const UserDashboard = () => {
         {error && <p className="text-center text-red-500">{error}</p>}
 
         {/* Portfolio Stocks Section */}
+        {/* Portfolio Stocks Section */}
         <section className="mt-6">
           <h2 className="text-2xl font-bold text-center mb-6">Current Holdings</h2>
           {loading ? (
             <Loader message="Loading your portfolio..." />
           ) : (
-            <div className="relative">
+            <div className="flex justify-center">
               {/* Horizontal Scroll Container */}
-              <div className="flex items-center relative">
+              <div className="relative w-full max-w-5xl">
                 {/* Left Scroll Button */}
                 <button
-                  className="hidden sm:flex absolute left-[-2rem] z-10 h-10 w-10 bg-gray-300 hover:bg-gray-400 rounded-full justify-center items-center shadow-lg transition"
+                  className="hidden sm:flex absolute top-1/2 left-[-5rem] z-10 h-10 w-10 bg-gray-100 hover:bg-gray-400 rounded-full justify-center items-center shadow-lg transition transform -translate-y-1/2"
                   onClick={() =>
                     document.getElementById("portfolioScroll").scrollBy({
                       left: -300,
@@ -104,7 +111,6 @@ const UserDashboard = () => {
                           className="h-20 w-20 mx-auto rounded-full mb-4 border border-gray-300"
                         />
                         {/* Stock Info */}
-                        
                         <h3 className="text-lg font-semibold text-center text-gray-700 group-hover:text-blue-600">
                           {stock.stockName || "N/A"}
                         </h3>
@@ -136,7 +142,7 @@ const UserDashboard = () => {
 
                 {/* Right Scroll Button */}
                 <button
-                  className="hidden sm:flex absolute right-[-2rem] z-10 h-10 w-10 bg-gray-300 hover:bg-gray-400 rounded-full justify-center items-center shadow-lg transition"
+                  className="hidden sm:flex absolute top-1/2 right-[-5rem] z-10 h-10 w-10 bg-gray-100 hover:bg-gray-400 rounded-full justify-center items-center shadow-lg transition transform -translate-y-1/2"
                   onClick={() =>
                     document.getElementById("portfolioScroll").scrollBy({
                       left: 300,
@@ -150,6 +156,8 @@ const UserDashboard = () => {
             </div>
           )}
         </section>
+
+
 
         <section className="mt-10">
           <h2 className="text-2xl font-bold text-center mb-6">

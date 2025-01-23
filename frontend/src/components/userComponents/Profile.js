@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
-import { fetchLoggedUser } from "../../services/UserService";
-// Adjust path as needed
+import { fetchLoggedUser } from "../../services/UserService"; // Adjust path as needed
 
 const Profile = ({ onClose }) => {
   const [profileDetails, setProfileDetails] = useState({
@@ -15,6 +14,7 @@ const Profile = ({ onClose }) => {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     const accessToken = localStorage.getItem("token"); // Assume token is stored in localStorage
@@ -31,8 +31,10 @@ const Profile = ({ onClose }) => {
         toast.error("Failed to fetch profile details.");
       }
     };
-
-    fetchProfile();
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      fetchProfile();
+    }
   }, []);
 
   const handleInputChange = (e) => {
@@ -46,92 +48,121 @@ const Profile = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-96 p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">User Profile</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 overflow-auto">
+      <div className="bg-white rounded-xl shadow-2xl w-96 p-6 transform transition-all hover:scale-105 max-h-[80vh] overflow-y-auto">
+        <div className="text-center mb-4">
+          <h2 className="text-2xl font-semibold text-gray-800">User Profile</h2>
+          <p className="text-sm text-gray-600">Manage your profile details</p>
+        </div>
+
         <div className="space-y-4">
+          {/* Avatar */}
+          <div className="flex justify-center mb-4">
+            <img
+              src={`https://ui-avatars.com/api/?name=${encodeURIComponent(profileDetails.firstName?.[0] || "U")}+${encodeURIComponent(profileDetails.lastName || "User")}&background=random`}
+              alt="Profile Avatar"
+              className="w-20 h-20 rounded-full border-4 border-blue-400 shadow-lg"
+            />
+          </div>
+
+
+          {/* First Name */}
           <div>
-            <label className="block text-gray-600 font-medium">First Name</label>
+            <label className="block text-gray-600 font-medium mb-2">First Name</label>
             {isEditing ? (
               <input
                 type="text"
                 name="firstName"
                 value={profileDetails.firstName}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
               />
             ) : (
-              <p>{profileDetails.firstName || "N/A"}</p>
+              <p className="text-lg text-gray-700">{profileDetails.firstName || "N/A"}</p>
             )}
           </div>
+
+          {/* Last Name */}
           <div>
-            <label className="block text-gray-600 font-medium">Last Name</label>
+            <label className="block text-gray-600 font-medium mb-2">Last Name</label>
             {isEditing ? (
               <input
                 type="text"
                 name="lastName"
                 value={profileDetails.lastName}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
               />
             ) : (
-              <p>{profileDetails.lastName || "N/A"}</p>
+              <p className="text-lg text-gray-700">{profileDetails.lastName || "N/A"}</p>
             )}
           </div>
+
+          {/* Username */}
           <div>
-            <label className="block text-gray-600 font-medium">Username</label>
-            <p>{profileDetails.username || "N/A"}</p>
+            <label className="block text-gray-600 font-medium mb-2">Username</label>
+            <p className="text-lg text-gray-700">{profileDetails.username || "N/A"}</p>
           </div>
+
+          {/* Email */}
           <div>
-            <label className="block text-gray-600 font-medium">Email</label>
-            <p>{profileDetails.email || "N/A"}</p>
+            <label className="block text-gray-600 font-medium mb-2">Email</label>
+            <p className="text-lg text-gray-700">{profileDetails.email || "N/A"}</p>
           </div>
+
+          {/* Mobile */}
           <div>
-            <label className="block text-gray-600 font-medium">Mobile</label>
+            <label className="block text-gray-600 font-medium mb-2">Mobile</label>
             {isEditing ? (
               <input
                 type="text"
                 name="mobileNumber"
                 value={profileDetails.mobileNumber}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:ring-2 focus:ring-blue-400 transition-all"
               />
             ) : (
-              <p>{profileDetails.mobileNumber || "N/A"}</p>
+              <p className="text-lg text-gray-700">{profileDetails.mobileNumber || "N/A"}</p>
             )}
           </div>
+
+          {/* Gender */}
           <div>
-            <label className="block text-gray-600 font-medium">Gender</label>
-            <p>{profileDetails.gender || "N/A"}</p>
+            <label className="block text-gray-600 font-medium mb-2">Gender</label>
+            <p className="text-lg text-gray-700">{profileDetails.gender || "N/A"}</p>
           </div>
+
+          {/* Date of Birth */}
           <div>
-            <label className="block text-gray-600 font-medium">Date of Birth</label>
-            <p>{profileDetails.dateOfBirth || "N/A"}</p>
+            <label className="block text-gray-600 font-medium mb-2">Date of Birth</label>
+            <p className="text-lg text-gray-700">{profileDetails.dateOfBirth || "N/A"}</p>
           </div>
         </div>
-        <div className="mt-6 flex justify-between">
+
+        <div className="mt-6 flex justify-between items-center">
           {isEditing ? (
             <button
               onClick={handleSave}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all w-full sm:w-auto mb-4"
             >
-              Save
+              Save Changes
             </button>
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all w-full sm:w-auto mb-4"
             >
-              Edit
+              Edit Profile
             </button>
           )}
           <button
             onClick={onClose}
-            className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all w-full sm:w-auto mb-4"
           >
             Close
           </button>
         </div>
+
       </div>
     </div>
   );

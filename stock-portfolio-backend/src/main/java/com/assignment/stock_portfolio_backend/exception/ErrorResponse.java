@@ -15,4 +15,10 @@ public class ErrorResponse {
     private int status;
     private String message;
     private LocalDateTime timestamp;
+
+    public ErrorResponse(int value, String message, String currentTimestamp) {
+        this.status=value;
+        this.message=message;
+        this.timestamp= LocalDateTime.parse(currentTimestamp);
+    }
 }

@@ -1,6 +1,7 @@
 package com.assignment.stock_portfolio_backend.service;
 
 import com.assignment.stock_portfolio_backend.dto.StockDetailResponse;
+import com.assignment.stock_portfolio_backend.exception.RateLimitException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,15 +35,23 @@ public class RecommendationServiceImpl  implements RecommendationService{
         return hardcodedData;
     }
 
+
     @Override
     public List<StockDetailResponse> fetchRecommendedStocks() {
         List<String> popularTickers = stockPriceService.getStockRecommendations();
         List<StockDetailResponse> recommendations = new ArrayList<>();
 
         for (String ticker : popularTickers) {
-            StockDetailResponse stockDetails = stockPriceService.getStockDetails(ticker);
-            if(isValidStock(stockDetails))
-                recommendations.add(stockDetails);
+            try {
+                StockDetailResponse stockDetails = stockPriceService.getStockDetails(ticker);
+                if (isValidStock(stockDetails)) {
+                    recommendations.add(stockDetails);
+                }
+            } catch (RateLimitException e) {
+                // Handle rate-limit gracefully in fetching details
+                System.err.println("Rate limit hit while fetching details for ticker: " + ticker);
+                break; // Stop further requests to avoid spamming the API
+            }
         }
         return recommendations;
     }

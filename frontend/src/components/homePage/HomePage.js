@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { fetchTopProfitableStocks } from "../../services/StockService";
 import StockCard from "../stockComponents/StockCard";
 import StockDetail from "../stockComponents/StockDetail";
@@ -13,7 +13,8 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
+  // useRef to ensure the API call is made only once
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     const loadStocks = async () => {
@@ -22,7 +23,6 @@ const HomePage = () => {
         setError(null);
 
         const data = await fetchTopProfitableStocks();
-
         setStocks(data);
       } catch (err) {
         setError("Failed to fetch stock data.");
@@ -31,7 +31,10 @@ const HomePage = () => {
       }
     };
 
-    loadStocks();
+    if (!hasFetched.current) {
+      hasFetched.current = true; // Mark as fetched
+      loadStocks();
+    }
   }, []);
 
   return (

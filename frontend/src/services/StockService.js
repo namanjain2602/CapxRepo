@@ -170,7 +170,7 @@ export const fetchPurchasedStockInfo = async (ticker) => {
   try {
     // Sending ticker as a request parameter
     const response = await axios.get(`${BASE_URL}/info`, { params: { ticker } });
-    console.log(response.data);
+      
     
     return response.data; // Return the data received from the backend
   } catch (error) {

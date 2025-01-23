@@ -1,45 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { fetchStocks } from "../services/StockService";
 import { toast } from "react-toastify";
 import Profile from "../components/userComponents/Profile";
 import { logoutUser } from "../services/UserService";
+import SearchBar from "./SearchBar";
 
 
 const UserNavbar = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [profileModal, setProfileModal] = useState(false);
   const navigate = useNavigate();
 
+  const handleStockSelect = (stock) => {
+    window.location.href = `/stock/${stock.symbol}`;
+  };
+
   useEffect(() => {
     if (!isLoggedIn) {
       toast.error("Please log in first.");
-      navigate("/"); // Redirect to the login page
+      navigate("/"); 
       return;
     }
+  }, []);
 
-    const fetchSearchResults = async () => {
-      if (searchTerm.trim() === "") {
-        setSearchResults([]);
-        return;
-      }
-      setIsSearching(true);
-      try {
-        const results = await fetchStocks(searchTerm);
-        setSearchResults(results);
-      } catch (err) {
-        console.error("Error fetching stock data:", err);
-      } finally {
-        setIsSearching(false);
-      }
-    };
-
-    const debounceTimer = setTimeout(() => fetchSearchResults(), 300);
-    return () => clearTimeout(debounceTimer);
-  }, [searchTerm]);
 
   const handleLogout = async () => {
     if (!isLoggedIn) {
@@ -82,37 +65,7 @@ const UserNavbar = () => {
           <span>CapGro</span>
         </Link>
 
-
-
-
-        {/* Search Bar */}
-        <div className="relative w-full max-w-lg">
-          <input
-            type="text"
-            placeholder="Search stocks"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg outline-none focus:ring-2 focus:ring-gray-400 text-gray-800"
-          />
-          {searchResults.length > 0 ? (
-            <ul className="absolute left-0 right-0 mt-2 bg-white text-gray-800 shadow-lg rounded-lg max-h-60 overflow-auto z-10">
-              {searchResults.map((stock) => (
-                <li key={stock.symbol} className="px-4 py-2 hover:bg-gray-100">
-                  <Link to={`/stock/${stock.symbol}`} className="block">
-                    {stock.description} ({stock.symbol})
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            !isSearching &&
-            searchTerm.trim() && (
-              <div className="absolute left-0 right-0 mt-2 bg-white text-gray-800 shadow-lg rounded-lg p-4">
-                <p>No results found.</p>
-              </div>
-            )
-          )}
-        </div>
+        <SearchBar onSelectStock={handleStockSelect} />
 
         {/* Navigation Links */}
         <div className="flex space-x-6 items-center">

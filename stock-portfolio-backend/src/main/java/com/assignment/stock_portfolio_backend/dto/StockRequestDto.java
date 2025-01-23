@@ -30,4 +30,6 @@ public class StockRequestDto {
     private Integer quantity;
 
     private String image;
+
+    private BigDecimal currentPrice;
 }

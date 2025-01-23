@@ -1,36 +1,19 @@
-import React, { useState, useEffect } from "react";
+// components/Navbar.js
+
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchStocks } from "../services/StockService";
+import SearchBar from "./SearchBar"; // Import the SearchBar component
 import Login from "../components/authComponents/Login";
 import Register from "../components/authComponents/Register";
 
 const Navbar = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
 
-  useEffect(() => {
-    const fetchSearchResults = async () => {
-      if (searchTerm.trim() === "") {
-        setSearchResults([]);
-        return;
-      }
-      setIsSearching(true);
-      try {
-        const results = await fetchStocks(searchTerm);
-        setSearchResults(results);
-      } catch (err) {
-        console.error("Error fetching stock data:", err);
-      } finally {
-        setIsSearching(false);
-      }
-    };
-
-    const debounceTimer = setTimeout(() => fetchSearchResults(), 300);
-    return () => clearTimeout(debounceTimer);
-  }, [searchTerm]);
+  // Handle stock selection from the search results
+  const handleStockSelect = (stock) => {
+    window.location.href = `/stock/${stock.symbol}`;
+  };
 
   return (
     <>
@@ -42,33 +25,7 @@ const Navbar = () => {
           </span>
           <span>CapGro</span>
         </Link>
-        <div className="relative w-full max-w-lg">
-          <input
-            type="text"
-            placeholder="Search stocks"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg outline-none focus:ring-2 focus:ring-gray-400 text-gray-800"
-          />
-          {searchResults.length > 0 ? (
-            <ul className="absolute left-0 right-0 mt-2 bg-white text-gray-800 shadow-lg rounded-lg max-h-60 overflow-auto z-10">
-              {searchResults.map((stock) => (
-                <li key={stock.symbol} className="px-4 py-2 hover:bg-gray-100">
-                  <Link to={`/stock/${stock.symbol}`} className="block">
-                    {stock.description} ({stock.symbol})
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            !isSearching &&
-            searchTerm.trim() && (
-              <div className="absolute left-0 right-0 mt-2 bg-white text-gray-800 shadow-lg rounded-lg p-4">
-                <p>No results found.</p>
-              </div>
-            )
-          )}
-        </div>
+        <SearchBar onSelectStock={handleStockSelect} /> {/* Use SearchBar component */}
         <div className="flex space-x-4">
           <button
             onClick={() => setShowLoginModal(true)}
