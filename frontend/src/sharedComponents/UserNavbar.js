@@ -5,10 +5,10 @@ import Profile from "../components/userComponents/Profile";
 import { logoutUser } from "../services/UserService";
 import SearchBar from "./SearchBar";
 
-
 const UserNavbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
   const [profileModal, setProfileModal] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // State for mobile menu
   const navigate = useNavigate();
 
   const handleStockSelect = (stock) => {
@@ -18,11 +18,10 @@ const UserNavbar = () => {
   useEffect(() => {
     if (!isLoggedIn) {
       toast.error("Please log in first.");
-      navigate("/"); 
+      navigate("/");
       return;
     }
   }, []);
-
 
   const handleLogout = async () => {
     if (!isLoggedIn) {
@@ -32,11 +31,10 @@ const UserNavbar = () => {
     }
 
     try {
-      const accessToken = localStorage.getItem("token"); // Retrieve the token from localStorage
+      const accessToken = localStorage.getItem("token");
 
       // Call the logout API
       await logoutUser(accessToken);
-
 
       // Remove token and update state
       localStorage.removeItem("logged");
@@ -56,47 +54,102 @@ const UserNavbar = () => {
 
   return (
     <>
-      <nav className="bg-gray-800 text-white py-4 px-6 flex items-center justify-between fixed top-0 left-0 right-0 z-10 shadow-md">
-        {/* Logo */}
-        <Link to="/user-dashboard" className="text-2xl font-bold flex items-center space-x-2">
-          <span role="img" aria-label="logo">
-            📊
-          </span>
-          <span>CapGro</span>
-        </Link>
-
-        <SearchBar onSelectStock={handleStockSelect} />
-
-        {/* Navigation Links */}
-        <div className="flex space-x-6 items-center">
-          {/* My Stocks */}
-          <Link to="/user-dashboard" className="text-gray-300 hover:text-blue-500 font-medium transition">
-
-            <span>Home</span>
+      <nav className="bg-gray-800 text-white py-4 px-6 fixed top-0 left-0 right-0 z-10 shadow-md">
+        <div className="flex items-center justify-between lg:justify-start lg:space-x-8">
+          {/* Logo */}
+          <Link to="/user-dashboard" className="text-2xl font-bold flex items-center space-x-2">
+          <img src="/favicon.ico" alt="logo" className="w-6 h-6" />
+            <span>CapGro</span>
           </Link>
-          <Link
-            to="/user-dashboard/my-stocks"
-            className="text-gray-300 hover:text-blue-500 font-medium transition"
+
+          {/* SearchBar (hidden on smaller screens) */}
+          <div className="hidden lg:block lg:flex-grow ">
+            <SearchBar onSelectStock={handleStockSelect} />
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="lg:hidden text-white focus:outline-none"
           >
-            Holdings
-          </Link>
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              {isMenuOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              )}
+            </svg>
+          </button>
 
-          {/* Profile Dropdown */}
-          <div className="relative group">
+          {/* Navigation Links (hidden on smaller screens) */}
+          <div className="hidden lg:flex lg:space-x-6 items-center">
+            <Link to="/user-dashboard" className="text-gray-300 hover:text-blue-500 font-medium transition">
+              Home
+            </Link>
+            <Link
+              to="/user-dashboard/my-stocks"
+              className="text-gray-300 hover:text-blue-500 font-medium transition"
+            >
+              Holdings
+            </Link>
             <span
               onClick={handleViewProfile}
               className="text-gray-300 cursor-pointer hover:text-gray-400 font-semibold transition"
             >
               Profile
             </span>
+            <span
+              onClick={handleLogout}
+              className="text-gray-300 cursor-pointer hover:text-red-700 font-medium transition"
+            >
+              Logout
+            </span>
           </div>
-          <span
-            onClick={handleLogout}
-            className="text-gray-300 cursor-pointer hover:text-red-700 font-medium transition"
-          >
-            Logout
-          </span>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="mt-4 space-y-4 lg:hidden">
+            <SearchBar onSelectStock={handleStockSelect} />
+            <Link to="/user-dashboard" className="block text-gray-300 hover:text-blue-500 font-medium transition">
+              Home
+            </Link>
+            <Link
+              to="/user-dashboard/my-stocks"
+              className="block text-gray-300 hover:text-blue-500 font-medium transition"
+            >
+              Holdings
+            </Link>
+            <span
+              onClick={handleViewProfile}
+              className="block text-gray-300 cursor-pointer hover:text-gray-400 font-semibold transition"
+            >
+              Profile
+            </span>
+            <span
+              onClick={handleLogout}
+              className="block text-gray-300 cursor-pointer hover:text-red-700 font-medium transition"
+            >
+              Logout
+            </span>
+          </div>
+        )}
       </nav>
 
       {/* Profile Modal */}

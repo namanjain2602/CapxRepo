@@ -96,7 +96,7 @@ const UserDashboard = () => {
                     portfolio.map((stock, index) => (
                       <a
                         key={index}
-                        href={`/stocks/${stock.ticker}`}
+                        href={`/stock/${stock.ticker}`}
                         className="min-w-[250px] bg-gradient-to-r from-blue-50 to-white shadow-lg rounded-lg p-4 hover:shadow-2xl transform transition-transform duration-300 hover:scale-105 group"
                       >
                         {/* Stock Logo */}

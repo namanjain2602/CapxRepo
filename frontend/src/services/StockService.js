@@ -1,13 +1,15 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/api/stocks";
+
+const BASE_URL = process.env.REACT_APP_API_URL
 const FINNHUB_API_KEY = "ctsl7qpr01qin3c01ofgctsl7qpr01qin3c01og0";
 
-/**
- * Fetch the top profitable stocks from Finnhub.
- */
+
+
 export const fetchTopProfitableStocks = async () => {
-  const apiUrl = `${BASE_URL}/recommendations`;
+  const apiUrl = `${BASE_URL}/api/stocks/recommendations`;
+
+  
 
   try {
     const response = await axios.get(apiUrl);
@@ -34,7 +36,7 @@ export const fetchStockDetails = async (ticker) => {
   if (!ticker) throw new Error("Ticker symbol is required to fetch stock details.");
 
   try {
-    const response = await axios.get(`${BASE_URL}/details/${ticker}`);
+    const response = await axios.get(`${BASE_URL}/api/stocks/details/${ticker}`);
     return response.data;
   } catch (error) {
     console.error(`Error fetching stock details for ${ticker}:`, error.message);
@@ -70,7 +72,7 @@ export const fetchStockHistory = async (symbol, start, end) => {
  */
 export const fetchStocks = async (query) => {
   try {
-    const response = await axios.get(`${BASE_URL}/search`, { params: { query } });
+    const response = await axios.get(`${BASE_URL}/api/stocks/search`, { params: { query } });
     return response.data;
   } catch (error) {
     console.error("Error fetching stocks:", error.message);
@@ -81,7 +83,7 @@ export const fetchStocks = async (query) => {
 
 export const fetchRecommendedStocks = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/recommendations`);
+    const response = await axios.get(`${BASE_URL}/api/stocks/recommendations`);
     return response.data;
   } catch (error) {
     console.error("Error fetching recommended stocks:", error.message);
@@ -98,7 +100,7 @@ export const buyStock = async (stockData) => {
     const headers = {
       Authorization: `Bearer ${token}`,
     };
-    const response = await axios.post(BASE_URL, stockData, { headers });
+    const response = await axios.post(`${BASE_URL}/api/stocks`, stockData, { headers });
     return response.data;
   } catch (error) {
     console.error("Error buying stock:", error.message);
@@ -113,7 +115,7 @@ export const sellStock = async (ticker, quantity) => {
   const token = localStorage.getItem("token");
   try {
     const response = await axios.delete(
-      `${BASE_URL}/${ticker}/${quantity}`,
+      `${BASE_URL}/api/stocks/${ticker}/${quantity}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -134,7 +136,7 @@ export const fetchPurchasedStocks = async () => {
   const accessToken = localStorage.getItem("token")
 
   try {
-    const response = await axios.get(BASE_URL, {
+    const response = await axios.get(`${BASE_URL}/api/stocks`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -169,7 +171,7 @@ export const fetchPurchasedStockInfo = async (ticker) => {
 
   try {
     // Sending ticker as a request parameter
-    const response = await axios.get(`${BASE_URL}/info`, { params: { ticker } });
+    const response = await axios.get(`${BASE_URL}/api/stocks/info`, { params: { ticker } });
       
     
     return response.data; // Return the data received from the backend

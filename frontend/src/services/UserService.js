@@ -1,10 +1,9 @@
 import axios from "axios";
-const API_BASE_URL = "http://localhost:8080/api/auth";
-
+const API_BASE_URL =process.env.REACT_APP_API_URL;
 
 export const registerUser = async (formData, tempRole = "user") => {
   try {
-    const response = await fetch(`${API_BASE_URL}/register?tempRole=${tempRole}`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register?tempRole=${tempRole}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25,7 +24,7 @@ export const registerUser = async (formData, tempRole = "user") => {
 
 export const loginUser = async (formData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -49,7 +48,7 @@ export const loginUser = async (formData) => {
 export const logoutUser = async (accessToken) => {
   try {
     const response = await axios.post(
-      `${API_BASE_URL}/logout`, // Replace with your logout API endpoint
+      `${API_BASE_URL}/api/auth/logout`, // Replace with your logout API endpoint
       {}, // If the API requires a body, provide it here
       {
         headers: {
@@ -66,7 +65,7 @@ export const logoutUser = async (accessToken) => {
 
 export const fetchLoggedUser = async (accessToken) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/loggedUser`, {
+    const response = await axios.get(`${API_BASE_URL}/api/auth/loggedUser`, {
       headers: {
         Authorization: `Bearer ${accessToken}`, // Pass the token in headers
       },

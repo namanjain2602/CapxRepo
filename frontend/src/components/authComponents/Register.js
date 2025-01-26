@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { registerUser } from "../../services/UserService";
 import { toast } from "react-toastify";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons
 
 const Register = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -16,38 +17,38 @@ const Register = ({ isOpen, onClose }) => {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev); 
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setError("");
-  
     try {
-      
-      
-      const response = await registerUser(formData, "user"); // Call the service method
-    toast.success("User registered successfully!");
-  
-    setFormData({
-      firstName: "",
-      lastName: "",
-      username: "",
-      password: "",
-      email: "",
-      mobileNumber: "",
-      gender: "",
-      dateOfBirth: "",
-    }); // Clear form
-  } catch (err) {
-    toast.error(err.message);
-  }
+      const response = await registerUser(formData, "user");
+      toast.success("User registered successfully!");
+      setFormData({
+        firstName: "",
+        lastName: "",
+        username: "",
+        password: "",
+        email: "",
+        mobileNumber: "",
+        gender: "",
+        dateOfBirth: "",
+      });
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
-  
 
   if (!isOpen) return null;
 
@@ -77,6 +78,7 @@ const Register = ({ isOpen, onClose }) => {
         {message && <p className="mb-4 text-green-600">{message}</p>}
         {error && <p className="mb-4 text-red-600">{error}</p>}
         <form onSubmit={handleSubmit}>
+          {/* Other Input Fields */}
           <input
             type="text"
             name="firstName"
@@ -104,15 +106,25 @@ const Register = ({ isOpen, onClose }) => {
             className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             required
           />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            required
-          />
+          {/* Password Field with Eye Icon */}
+          <div className="relative mb-4">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 focus:outline-none"
+            >
+              {showPassword ? <FaEye />  : <FaEyeSlash />}
+            </button>
+          </div>
           <input
             type="email"
             name="email"

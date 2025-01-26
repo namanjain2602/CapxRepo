@@ -2,6 +2,7 @@ package com.assignment.stock_portfolio_backend.service;
 
 import com.assignment.stock_portfolio_backend.dto.PortfolioDetailResponse;
 import com.assignment.stock_portfolio_backend.dto.StockRequestDto;
+import com.assignment.stock_portfolio_backend.exception.StockException;
 import com.assignment.stock_portfolio_backend.exception.UserRelatedException;
 import com.assignment.stock_portfolio_backend.model.Stock;
 import com.assignment.stock_portfolio_backend.model.Token;
@@ -35,6 +36,9 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public Stock addStock(StockRequestDto stockRequestDto, String token) {
+        if(stockRequestDto.getTicker().contains(".")){
+            throw new StockException("No Stock Exist");
+        }
         Token tokenObject = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new UserRelatedException("Token cannot be found"));
 

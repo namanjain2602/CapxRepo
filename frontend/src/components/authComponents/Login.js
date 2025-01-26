@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/UserService";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const Login = ({ isOpen, onClose }) => {
     role: "user",
   });
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -34,6 +36,7 @@ const Login = ({ isOpen, onClose }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
@@ -46,7 +49,6 @@ const Login = ({ isOpen, onClose }) => {
 
     try {
       const data = await loginUser(formData);
-      //;
 
       localStorage.setItem("logged", data.role);
       localStorage.setItem("token", data.accessToken);
@@ -57,12 +59,16 @@ const Login = ({ isOpen, onClose }) => {
       setErrors({ general: err.message });
     }
   };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
-        {/* Close Icon */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition focus:outline-none"
@@ -87,7 +93,6 @@ const Login = ({ isOpen, onClose }) => {
           <p className="text-red-500 mb-4">{errors.general}</p>
         )}
         <form onSubmit={handleSubmit}>
-          {/* Username or Email Field */}
           <input
             type="text"
             name="usernameOrEmail"
@@ -102,20 +107,26 @@ const Login = ({ isOpen, onClose }) => {
             </p>
           )}
 
-          {/* Password Field */}
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className="w-full px-4 py-2 mb-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
+          <div className="relative w-full mb-4">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <span
+              onClick={togglePasswordVisibility}
+              className="absolute top-2.5 right-3 cursor-pointer text-gray-600 hover:text-gray-800"
+            >
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
+          </div>
           {errors.password && (
             <p className="text-red-500 text-sm mb-4">{errors.password}</p>
           )}
 
-          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition"

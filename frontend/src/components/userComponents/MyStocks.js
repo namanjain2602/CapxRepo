@@ -86,18 +86,31 @@ const MyStocks = () => {
                 <p className="mb-2">
                   <span className="text-black">Total Portfolio Value: </span>
                   <span className={isProfit ? "text-green-600" : "text-red-600"}>
-                    ${portfolioValue.toFixed(2)}
+                    {portfolioValue !== 0
+                      ? `$${portfolioValue.toFixed(2)}`
+                      : "Fetching data..."}
                   </span>
                 </p>
 
                 {/* Invested Amount */}
-                <p>Total Invested Amount: ${totalInvested.toFixed(2)}</p>
+                <p>
+                  Total Invested Amount:{" "}
+                  {totalInvested !== 0
+                    ? `$${totalInvested.toFixed(2)}`
+                    : "Fetching data..."}
+                </p>
 
                 {/* Profit or Loss */}
-                <p className={`mt-4 ${isProfit ? "text-green-600" : "text-red-600"}`}>
-                  {isProfit ? `Profit` : `Loss`}: ${Math.abs(difference).toFixed(2)} ({Math.abs(percentage)}%)
-                </p>
-              </>
+                <p
+                  className={`mt-4 ${isProfit ? "text-green-600" : "text-red-600"
+                    }`}
+                >
+                  {!isNaN(difference) && !isNaN(percentage)
+                    ? `${isProfit ? "Profit" : "Loss"}: $${Math.abs(difference).toFixed(
+                      2
+                    )} (${Math.abs(percentage)}%)`
+                    : "Calculating..."}
+                </p>              </>
             );
           })()}
         </div>
@@ -127,9 +140,9 @@ const MyStocks = () => {
                 />
                 <h2 className="text-xl font-bold text-gray-700">{stock.stockName}</h2>
                 <p className="text-gray-500">{stock.ticker}</p>
-                
+
                 <p className="text-lg font-semibold  mt-2">
-                  
+
                   Buy Price: ${stock.buyPrice.toFixed(2)}
                 </p>
                 <p className="text-gray-500 font-semibold">Quantity: {stock.quantity}</p>

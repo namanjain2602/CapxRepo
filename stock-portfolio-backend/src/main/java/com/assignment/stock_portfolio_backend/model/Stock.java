@@ -27,10 +27,7 @@ public class Stock {
     //@NotBlank(message = "Stock name cannot be null")
     private String stockName;
 
-
-
     //@NotBlank(message = "Ticker cannot be blank")
-    @Column(unique = true)
     private String ticker;
 
   //  @NotNull(message = "Buy price cannot be null")
