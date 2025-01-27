@@ -1,9 +1,10 @@
 # CapxRepo
 
 ## Overview
-CapxRepo is a full-stack web application that allows users to manage their stock portfolios. Built with React.js on the frontend and Spring Boot on the backend, it offers features like viewing real-time stock prices, adding/removing stocks from the portfolio, and personalized stock recommendations. The app integrates the Finhub API to fetch real-time stock data and uses JWT-based authentication to manage user accounts.
+CapxRepo is a full-stack web application that allows users to manage their stock portfolios. Built with React.js on the frontend and Spring Boot on the backend with postgre as database, it offers features like viewing real-time stock prices, adding/removing stocks from the portfolio, and personalized stock recommendations. The app integrates the Finhub API to fetch real-time stock data and uses JWT-based authentication to manage user accounts.
 - **Live Demo**: [CapGro](https://capgro.netlify.app/)
-- Use Credentials for login (username - naman@123 , password- Naman@123)
+- Use Credentials for login (username - naman@123 , password- Naman@123) or you can signup as per your preference.
+- **Note**: The backend is deployed on the free tier of the Render platform, which may result in some delays in loading data, particularly during the first run or when the server has been idle. Please allow at least 50 seconds or more for the data to appear initially. ![Reason](delay_Info_Reason.png).
 
 ## Features
 - **Real-Time Stock Price Updates**: Uses Finhub API to display live stock data.
@@ -82,7 +83,6 @@ Before setting up the project, ensure you have the following installed:
     `mvn spring-boot:run` 
     
 3.  The backend API will be accessible at `http://localhost:8080`.  
--  **Note**: The database might take some time to load the data initially, especially during the first run or if the server is idle. Please allow some time for the data to appear.
 
 ## Docker Setup
 
